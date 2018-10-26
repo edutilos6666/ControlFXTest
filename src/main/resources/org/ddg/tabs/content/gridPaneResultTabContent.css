@@ -1,3 +1,16 @@
-.textfield {
+* {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+.text-field {
+    -fx-pref-width: 300px;
+    -fx-pref-height: 50px;
+    -fx-border-color: black;
+    -fx-border-width: 3px;
+}
 
+.button {
+    -fx-background-color: blue;
+    -fx-text-fill: white;
+    -fx-padding: 10px 20px;
 }

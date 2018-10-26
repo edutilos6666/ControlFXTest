@@ -6,19 +6,19 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-import static org.ddg.utils.Constants.delimiter;
-import static org.ddg.utils.Constants.separator;
+import static org.ddg.utils.Constants.DELIMITER;
+import static org.ddg.utils.Constants.SEPARATOR;
 import static org.ddg.utils.CustomAlerts.showErrorAlert;
 import static org.ddg.utils.CustomAlerts.showInfoAlert;
 
-public class GridPaneResutTabContent {
+public class GridPaneResultTabContent {
     private GridPane root;
     private Label lblId, lblName, lblPassword, lblAge, lblWage, lblActive;
     private TextField fieldId, fieldName, fieldAge, fieldWage, fieldActive;
     private PasswordField fieldPassword;
     private Button btnSubmit, btnClear;
 
-    public GridPaneResutTabContent() {
+    public GridPaneResultTabContent() {
         root = buildContent();
     }
 
@@ -28,6 +28,7 @@ public class GridPaneResutTabContent {
         root.setVgap(10);
         addComponents();
         root.getStylesheets().add("org/ddg/tabs/content/gridPaneResultTabContent.css");
+        registerEvents();
         return root;
     }
 
@@ -72,12 +73,12 @@ public class GridPaneResutTabContent {
         btnSubmit.setOnAction(evt-> {
             try {
                 StringBuilder sb = new StringBuilder();
-                sb.append(lblId.getText()).append(delimiter).append(fieldId.getText()).append(separator)
-                        .append(lblName.getText()).append(delimiter).append(fieldName.getText()).append(separator)
-                        .append(lblPassword.getText()).append(delimiter).append(fieldPassword.getText()).append(separator)
-                        .append(lblAge.getText()).append(delimiter).append(fieldAge.getText()).append(separator)
-                        .append(lblWage.getText()).append(delimiter).append(fieldWage.getText()).append(separator)
-                        .append(lblActive.getText()).append(delimiter).append(fieldActive.getText()).append(separator);
+                sb.append(lblId.getText()).append(DELIMITER).append(Integer.parseInt(fieldId.getText())).append(SEPARATOR)
+                        .append(lblName.getText()).append(DELIMITER).append(fieldName.getText()).append(SEPARATOR)
+                        .append(lblPassword.getText()).append(DELIMITER).append(fieldPassword.getText()).append(SEPARATOR)
+                        .append(lblAge.getText()).append(DELIMITER).append(Integer.parseInt(fieldAge.getText())).append(SEPARATOR)
+                        .append(lblWage.getText()).append(DELIMITER).append(Double.parseDouble(fieldWage.getText())).append(SEPARATOR)
+                        .append(lblActive.getText()).append(DELIMITER).append(Boolean.parseBoolean(fieldActive.getText())).append(SEPARATOR);
                 showInfoAlert(sb.toString());
             } catch(Exception ex) {
                 showErrorAlert(ex.getMessage());

@@ -9,6 +9,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.ddg.tabs.GridPaneTabs;
+import org.ddg.tabs.ITabsGenerator;
+import org.ddg.tabs.TableViewTabs;
+import org.ddg.tabs.VBoxHBoxTabs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +45,20 @@ public class MainController {
 
     private void refreshListView(List<String> listContent) {
         listItems.getItems().clear();
-        Label lblGridPaneTabs = new Label("GridPane");
-        lblGridPaneTabs.setOnMouseClicked(evt-> {
-            tabPaneDisplay.getTabs().clear();
-            tabPaneDisplay.getTabs().addAll(new GridPaneTabs().getAllTabs());
-        });
-        listItems.getItems().add(lblGridPaneTabs);
+        addLabelToListItems("GridPane", new GridPaneTabs());
+        addLabelToListItems("VBoxHBox", new VBoxHBoxTabs());
+        addLabelToListItems("TableView", new TableViewTabs());
         listItems.getItems().addAll(listContent.stream().map(txt-> new Label(txt)).collect(Collectors.toList()));
+    }
+
+    private void addLabelToListItems(String lblContent, ITabsGenerator tabsGenerator) {
+        Label lblPane = new Label(lblContent);
+        lblPane.setOnMouseClicked(evt-> {
+            if(evt.getClickCount() != 2) return;
+            tabPaneDisplay.getTabs().clear();
+            tabPaneDisplay.getTabs().addAll(tabsGenerator.getAllTabs());
+        });
+        listItems.getItems().add(lblPane);
     }
 
     private void registerEvents() {
@@ -60,3 +70,5 @@ public class MainController {
        });
     }
 }
+
+

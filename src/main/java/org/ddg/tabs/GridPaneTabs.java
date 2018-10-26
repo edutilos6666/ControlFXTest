@@ -1,10 +1,8 @@
 package org.ddg.tabs;
 
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.AnchorPane;
-import org.ddg.tabs.content.GridPaneResutTabContent;
-import org.ddg.utils.CustomFileReader;
+import org.ddg.tabs.content.GridPaneResultTabContent;
+import org.ddg.utils.JavafxUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,29 +13,25 @@ public class GridPaneTabs implements ITabsGenerator{
     @Override
     public Tab getResultTab() {
         Tab tab = new Tab(RESULT);
-        tab.setContent(new GridPaneResutTabContent().buildContent());
+        tab.setContent(new GridPaneResultTabContent().buildContent());
         return tab;
     }
 
     @Override
     public Tab getSourceCodeTab() {
-        Tab tab = new Tab(TabNamesEnum.SOURCE_CODE);
-        AnchorPane root = new AnchorPane();
-        String fullPath = System.getProperty("user.dir") +"/src/main/java/org/ddg/tabs/content/GridPaneResutTabContent.java";
-        TextArea area = new TextArea(CustomFileReader.readFromAbsoultePath(fullPath));
-        root.getChildren().add(area);
-        tab.setContent(root);
-        return tab;
+        String fullPath = System.getProperty("user.dir") +"/src/main/java/org/ddg/tabs/content/GridPaneResultTabContent.java";
+        return JavafxUtils.generateSourceCodeTab(fullPath);
     }
 
     @Override
     public Tab getCSSTab() {
-        return new Tab(CSS);
+        String fullPath = System.getProperty("user.dir") +"/src/main/resources/org/ddg/tabs/content/gridPaneResultTabContent.css";
+        return JavafxUtils.generateCssTab(fullPath);
     }
 
     @Override
     public Tab getJavaDocTab() {
-        return new Tab(JAVA_DOC);
+      return JavafxUtils.generateJavaDocTab("https://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/GridPane.html");
     }
 
     @Override

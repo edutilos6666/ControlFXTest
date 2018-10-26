@@ -1,0 +1,15 @@
+/*.table-view .column-header {
+    -fx-text-fill: white;
+    -fx-background-color: white;
+    -fx-min-width: 100px;
+}*/
+
+.table-view .column-header-background .label {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}
+
+.table-row-cell {
+    /*-fx-background-color: blue;*/
+    -fx-text-fill: white;
+}

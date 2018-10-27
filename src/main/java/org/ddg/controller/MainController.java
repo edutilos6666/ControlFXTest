@@ -18,10 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import lombok.Data;
-import org.ddg.tabs.GridPaneTabs;
-import org.ddg.tabs.ITabsGenerator;
-import org.ddg.tabs.TableViewTabs;
-import org.ddg.tabs.VBoxHBoxTabs;
+import org.ddg.tabs.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +78,8 @@ public class MainController {
         ObservableList<CustomListItem> items = FXCollections.observableArrayList(
                 new CustomListItem(new Label("GridPane"), new GridPaneTabs()),
                 new CustomListItem(new Label("VBoxHBox"), new VBoxHBoxTabs()),
-                new CustomListItem(new Label("TableView"), new TableViewTabs())
+                new CustomListItem(new Label("TableView"), new TableViewTabs()),
+                new CustomListItem(new Label("TreeView"), new TreeViewTabs())
         );
         listContent.addAll(items);
         refreshListView(listContent);

@@ -11,6 +11,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -69,9 +70,15 @@ public class TableViewResultTabContent {
        addMockDataToTableView();
        ScrollPane center = new ScrollPane(workerTableView);
        root.setCenter(center);
-
+       VBox vbControls = new VBox();
        btnCreate = new Button("Create New Worker");
-       root.setBottom(btnCreate);
+       vbControls.getChildren().addAll(
+         btnCreate, new Label("Enter => WorkerDetailsWindow"),
+               new Label("Ctrl+C => WorkerCreateWindow"),
+               new Label("Ctrl+E => WorkerUpdateWindow"),
+               new Label("Ctrl+D => Delete selected Worker")
+       );
+       root.setBottom(vbControls);
     }
 
     private void setupTableViewColumns() {
@@ -177,6 +184,7 @@ public class TableViewResultTabContent {
                     controller.setSelectedWorker(w);
                     Scene scene = new Scene(root);
                     stage.setScene(scene);
+                    controller.registerKeyBindings(scene);
                     stage.setTitle("WorkerDetails");
                     stage.showAndWait();
                 } catch (IOException e) {
@@ -195,37 +203,49 @@ public class TableViewResultTabContent {
                     controller.setDAOAndWorker(dao,w);
                     Scene scene = new Scene(root);
                     stage.setScene(scene);
+                    controller.registerKeyBindings(scene);
                     stage.setTitle("Update Selected Worker");
                     stage.showAndWait();
                     refreshTable();
                 } catch (IOException e2) {
                     e2.printStackTrace();
                 }
-            } if(evt.isControlDown() && evt.getCode() == KeyCode.D) {
+            }
+            if(evt.isControlDown() && evt.getCode() == KeyCode.D) {
                 Worker w = workerTableView.getSelectionModel().getSelectedItem();
                 if(w == null) return;
                 dao.delete(w.getId());
                 refreshTable();
             }
+
+            if(evt.isControlDown() && evt.getCode() == KeyCode.C) {
+                showWorkerCreateWindow();
+            }
         });
 
         btnCreate.setOnAction(e-> {
-            Stage stage = new Stage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/WorkerCreateWindow.fxml"));
-            AnchorPane root = null;
-            try {
-                root = (AnchorPane)loader.load();
-                WorkerCreateController controller = loader.getController();
-                controller.setDAO(dao);
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.setTitle("Create New Worker");
-                stage.showAndWait();
-                refreshTable();
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            }
+            showWorkerCreateWindow();
         });
+
+    }
+
+    private void showWorkerCreateWindow() {
+        Stage stage = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/WorkerCreateWindow.fxml"));
+        AnchorPane root = null;
+        try {
+            root = (AnchorPane)loader.load();
+            WorkerCreateController controller = loader.getController();
+            controller.setDAO(dao);
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            controller.registerKeyBindings(scene);
+            stage.setTitle("Create New Worker");
+            stage.showAndWait();
+            refreshTable();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        }
     }
 
 }

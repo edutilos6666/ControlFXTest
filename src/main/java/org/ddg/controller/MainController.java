@@ -1,13 +1,23 @@
 package org.ddg.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+import lombok.Data;
 import org.ddg.tabs.GridPaneTabs;
 import org.ddg.tabs.ITabsGenerator;
 import org.ddg.tabs.TableViewTabs;
@@ -21,11 +31,28 @@ public class MainController {
     @FXML
     private TextField fieldSearch;
     @FXML
-    private ListView<Label> listItems;
+    private ListView<CustomListItem> listItems;
     @FXML
     private TabPane tabPaneDisplay;
 
-    private List<String> listContent = new ArrayList<>();
+    private List<CustomListItem> listContent = new ArrayList<>();
+
+
+    public void registerKeyBindings(Scene scene) {
+        KeyCombination keyCombination = new KeyCodeCombination(
+                KeyCode.F1, KeyCodeCombination.CONTROL_DOWN
+        );
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(keyCombination.match(event)) {
+                    fieldSearch.requestFocus();
+                } else if(event.getCode() == KeyCode.ESCAPE) {
+                    ((Stage)scene.getWindow()).close();
+                }
+            }
+        });
+    }
 
     @FXML
     public void initialize() {
@@ -33,41 +60,64 @@ public class MainController {
         tabPaneDisplay.setPadding(new Insets(10));
 //        tabPaneDisplay.getStylesheets().add(getClass().getResource("/main.css").getFile());
         tabPaneDisplay.getStylesheets().add("main.css");
-        for(int i=0; i < 1000; ++i) {
-            listContent.add(String.format("Item %d", i));
-        }
-
-
+        listItems.setCellFactory(new Callback<ListView<CustomListItem>, ListCell<CustomListItem>>() {
+            @Override
+            public ListCell<CustomListItem> call(ListView<CustomListItem> param) {
+                return new ListCell<CustomListItem>() {
+                    @Override
+                    protected void updateItem(CustomListItem item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if(item == null || empty) {
+                            setText(null);
+                            setStyle("");
+                        } else {
+                            setText(item.getContent().getText());
+                        }
+                    }
+                };
+            }
+        });
+        listItems.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        ObservableList<CustomListItem> items = FXCollections.observableArrayList(
+                new CustomListItem(new Label("GridPane"), new GridPaneTabs()),
+                new CustomListItem(new Label("VBoxHBox"), new VBoxHBoxTabs()),
+                new CustomListItem(new Label("TableView"), new TableViewTabs())
+        );
+        listContent.addAll(items);
         refreshListView(listContent);
         registerEvents();
 
     }
 
-    private void refreshListView(List<String> listContent) {
+    private void refreshListView(List<CustomListItem> items) {
         listItems.getItems().clear();
-        addLabelToListItems("GridPane", new GridPaneTabs());
-        addLabelToListItems("VBoxHBox", new VBoxHBoxTabs());
-        addLabelToListItems("TableView", new TableViewTabs());
-        listItems.getItems().addAll(listContent.stream().map(txt-> new Label(txt)).collect(Collectors.toList()));
+        listItems.getItems().addAll(items);
     }
 
-    private void addLabelToListItems(String lblContent, ITabsGenerator tabsGenerator) {
-        Label lblPane = new Label(lblContent);
-        lblPane.setOnMouseClicked(evt-> {
-            if(evt.getClickCount() != 2) return;
-            tabPaneDisplay.getTabs().clear();
-            tabPaneDisplay.getTabs().addAll(tabsGenerator.getAllTabs());
-        });
-        listItems.getItems().add(lblPane);
-    }
 
     private void registerEvents() {
        fieldSearch.setOnKeyReleased(evt-> {
-           List<String> tmp = listContent.stream().filter(el-> {
-              return el.contains(fieldSearch.getText());
+           List<CustomListItem> tmp = listContent.stream().filter(el-> {
+              return el.getContent().getText().toLowerCase().contains(fieldSearch.getText().toLowerCase());
            }).collect(Collectors.toList());
            refreshListView(tmp);
        });
+        listItems.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue == null) return;
+            tabPaneDisplay.getTabs().clear();
+            tabPaneDisplay.getTabs().addAll(newValue.getTabsGenerator().getAllTabs());
+        });
+    }
+
+    @Data
+    private class CustomListItem {
+        private Label content;
+        private ITabsGenerator tabsGenerator;
+
+        public CustomListItem(Label content, ITabsGenerator tabsGenerator) {
+            this.content = content;
+            this.tabsGenerator = tabsGenerator;
+        }
     }
 }
 

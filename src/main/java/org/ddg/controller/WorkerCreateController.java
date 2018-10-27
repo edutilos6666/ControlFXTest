@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
@@ -43,43 +44,75 @@ public class WorkerCreateController {
 
     private void registerEvents() {
         btnCreate.setOnAction(e-> {
-            try {
-                long id = Long.parseLong(fieldId.getText());
-                String fname = fieldFname.getText();
-                String lname = fieldLname.getText();
-                int age = Integer.parseInt(fieldAge.getText());
-                double wage = Double.parseDouble(fieldWage.getText());
-                boolean active = Boolean.parseBoolean(fieldActive.getText());
-                ObservableList<String> activities = lvActivities.getSelectionModel().getSelectedItems();
-                String country = fieldCountry.getText();
-                String city = fieldCity.getText();
-                String street = fieldStreet.getText();
-                String plz = fieldPlz.getText();
-                dao.create(new Worker(id, fname, lname, age, wage, active, activities, country, city, street, plz));
-                closeScene();
-            } catch(Exception ex) {
-                CustomAlerts.showErrorAlert(ex.getMessage());
-            }
+            executeCreate();
         });
 
         btnClear.setOnAction(e-> {
-            fieldId.clear();
-            fieldFname.clear();
-            fieldLname.clear();
-            fieldAge.clear();
-            fieldWage.clear();
-            fieldActive.clear();
-//            lvActivities.setItems(FXCollections.observableArrayList());
-            lvActivities.getSelectionModel().clearSelection();
-            fieldCountry.clear();
-            fieldCity.clear();
-            fieldStreet.clear();
-            fieldPlz.clear();
+            executeClear();
         });
 
         btnCancel.setOnAction(e-> {
             closeScene();
         });
+
+        btnCreate.setOnKeyPressed(evt-> {
+            if(evt.getCode() == KeyCode.ENTER)
+                executeCreate();
+        });
+
+        btnClear.setOnKeyPressed(evt -> {
+            if(evt.getCode() == KeyCode.ENTER)
+                executeClear();
+        });
+
+        btnCancel.setOnKeyPressed(evt -> {
+            if(evt.getCode() == KeyCode.ENTER)
+                closeScene();
+        });
+    }
+
+    public void registerKeyBindings(Scene scene)  {
+        scene.setOnKeyPressed(evt-> {
+            if(evt.getCode() == KeyCode.ESCAPE) {
+                closeScene();
+            }
+        });
+    }
+
+
+
+    private void executeCreate() {
+        try {
+            long id = Long.parseLong(fieldId.getText());
+            String fname = fieldFname.getText();
+            String lname = fieldLname.getText();
+            int age = Integer.parseInt(fieldAge.getText());
+            double wage = Double.parseDouble(fieldWage.getText());
+            boolean active = Boolean.parseBoolean(fieldActive.getText());
+            ObservableList<String> activities = lvActivities.getSelectionModel().getSelectedItems();
+            String country = fieldCountry.getText();
+            String city = fieldCity.getText();
+            String street = fieldStreet.getText();
+            String plz = fieldPlz.getText();
+            dao.create(new Worker(id, fname, lname, age, wage, active, activities, country, city, street, plz));
+            closeScene();
+        } catch(Exception ex) {
+            CustomAlerts.showErrorAlert(ex.getMessage());
+        }
+    }
+
+    private void executeClear() {
+        fieldId.clear();
+        fieldFname.clear();
+        fieldLname.clear();
+        fieldAge.clear();
+        fieldWage.clear();
+        fieldActive.clear();
+        lvActivities.getSelectionModel().clearSelection();
+        fieldCountry.clear();
+        fieldCity.clear();
+        fieldStreet.clear();
+        fieldPlz.clear();
     }
 
     private void closeScene() {

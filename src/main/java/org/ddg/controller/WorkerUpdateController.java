@@ -3,10 +3,12 @@ package org.ddg.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.ddg.dao.WorkerDAO;
 import org.ddg.model.Worker;
@@ -54,44 +56,75 @@ public class WorkerUpdateController {
 
     private void registerEvents() {
         btnUpdate.setOnAction(e-> {
-            try {
-                long id = Long.parseLong(fieldId.getText());
-                String fname = fieldFname.getText();
-                String lname = fieldLname.getText();
-                int age = Integer.parseInt(fieldAge.getText());
-                double wage = Double.parseDouble(fieldWage.getText());
-                boolean active = Boolean.parseBoolean(fieldActive.getText());
-                ObservableList<String> activities = lvActivities.getSelectionModel().getSelectedItems();
-                String country = fieldCountry.getText();
-                String city = fieldCity.getText();
-                String street = fieldStreet.getText();
-                String plz = fieldPlz.getText();
-                dao.update(id, new Worker(id, fname, lname, age, wage, active, activities, country, city, street, plz));
-                closeScene();
-            } catch(Exception ex) {
-                CustomAlerts.showErrorAlert(ex.getMessage());
-            }
+            executeUpdate();
         });
 
         btnClear.setOnAction(e-> {
-            fieldId.setText(worker.getId()+"");
-            fieldFname.setText(worker.getFname());
-            fieldLname.setText(worker.getLname());
-            fieldAge.setText(worker.getAge()+"");
-            fieldWage.setText(worker.getWage()+"");
-            fieldActive.setText(worker.isActive()+"");
-            fieldCountry.setText(worker.getCountry());
-            fieldCity.setText(worker.getCity());
-            fieldStreet.setText(worker.getStreet());
-            fieldPlz.setText(worker.getPlz());
-            lvActivities.getSelectionModel().clearSelection();
-            worker.getActivities().forEach(act-> {
-                lvActivities.getSelectionModel().select(act);
-            });
+            executeClear();
         });
 
         btnCancel.setOnAction(e-> {
             closeScene();
+        });
+
+        btnUpdate.setOnKeyPressed(evt-> {
+            if(evt.getCode() == KeyCode.ENTER)
+                executeUpdate();
+        });
+
+        btnClear.setOnKeyPressed(evt -> {
+            if(evt.getCode() == KeyCode.ENTER)
+                executeClear();
+        });
+
+        btnCancel.setOnKeyPressed(evt -> {
+            if(evt.getCode() == KeyCode.ENTER)
+                closeScene();
+        });
+    }
+
+    public void registerKeyBindings(Scene scene)  {
+        scene.setOnKeyPressed(evt-> {
+            if(evt.getCode() == KeyCode.ESCAPE) {
+                closeScene();
+            }
+        });
+    }
+
+    private void executeUpdate() {
+        try {
+            long id = Long.parseLong(fieldId.getText());
+            String fname = fieldFname.getText();
+            String lname = fieldLname.getText();
+            int age = Integer.parseInt(fieldAge.getText());
+            double wage = Double.parseDouble(fieldWage.getText());
+            boolean active = Boolean.parseBoolean(fieldActive.getText());
+            ObservableList<String> activities = lvActivities.getSelectionModel().getSelectedItems();
+            String country = fieldCountry.getText();
+            String city = fieldCity.getText();
+            String street = fieldStreet.getText();
+            String plz = fieldPlz.getText();
+            dao.update(id, new Worker(id, fname, lname, age, wage, active, activities, country, city, street, plz));
+            closeScene();
+        } catch(Exception ex) {
+            CustomAlerts.showErrorAlert(ex.getMessage());
+        }
+    }
+
+    private void executeClear() {
+        fieldId.setText(worker.getId()+"");
+        fieldFname.setText(worker.getFname());
+        fieldLname.setText(worker.getLname());
+        fieldAge.setText(worker.getAge()+"");
+        fieldWage.setText(worker.getWage()+"");
+        fieldActive.setText(worker.isActive()+"");
+        fieldCountry.setText(worker.getCountry());
+        fieldCity.setText(worker.getCity());
+        fieldStreet.setText(worker.getStreet());
+        fieldPlz.setText(worker.getPlz());
+        lvActivities.getSelectionModel().clearSelection();
+        worker.getActivities().forEach(act-> {
+            lvActivities.getSelectionModel().select(act);
         });
     }
 

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -41,11 +42,6 @@ public class WorkerDetailsController {
     }
     @FXML
     public void initialize() {
-        btnClose.requestFocus();
-        btnClose.setOnAction(evt-> {
-            closeScene();
-        });
-
         ObservableList<Node> nodes = FXCollections.observableArrayList(
                 btnClose, fieldId, fieldFname, fieldLname,
                 fieldAge, fieldWage, fieldActive, fieldCountry,
@@ -56,6 +52,29 @@ public class WorkerDetailsController {
             if(e.getCode() == KeyCode.ENTER) closeScene();
         }));
 
+        registerEvents();
+    }
+
+    private void registerEvents() {
+        btnClose.requestFocus();
+        btnClose.setOnAction(evt-> {
+            closeScene();
+        });
+
+        btnClose.setOnKeyPressed(evt -> {
+            if(evt.getCode() == KeyCode.ENTER)
+                closeScene();
+        });
+
+
+    }
+
+    public void registerKeyBindings(Scene scene) {
+        scene.setOnKeyPressed(evt-> {
+            if(evt.getCode() == KeyCode.ESCAPE) {
+                closeScene();
+            }
+        });
     }
 
     private void closeScene() {

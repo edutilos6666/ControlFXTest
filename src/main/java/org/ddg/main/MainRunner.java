@@ -24,6 +24,7 @@ public class MainRunner extends Application {
         MainController controller = loader.getController();
         Scene scene = new Scene(loader.getRoot());
         primaryStage.setScene(scene);
+        controller.registerKeyBindings(scene);
         primaryStage.setTitle("FX Sampler");
         primaryStage.setResizable(false);
         primaryStage.show();

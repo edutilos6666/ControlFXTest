@@ -94,7 +94,8 @@ public class WorkerCreateController {
             String city = fieldCity.getText();
             String street = fieldStreet.getText();
             String plz = fieldPlz.getText();
-            dao.create(new Worker(id, fname, lname, age, wage, active, activities, country, city, street, plz));
+//            dao.create(new Worker(id, fname, lname, age, wage, active, activities, country, city, street, plz));
+            dao.create(new Worker(fname, lname, age, wage, active, activities, country, city, street, plz));
             closeScene();
         } catch(Exception ex) {
             CustomAlerts.showErrorAlert(ex.getMessage());

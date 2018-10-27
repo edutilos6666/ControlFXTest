@@ -1,9 +1,15 @@
 package org.ddg.model;
 
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.EqualsAndHashCode;
 
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name="worker")
 @EqualsAndHashCode
 public class Worker {
     private LongProperty id = new SimpleLongProperty();
@@ -18,19 +24,33 @@ public class Worker {
     private StringProperty street = new SimpleStringProperty();
     private StringProperty plz = new SimpleStringProperty();
 
-    public Worker(long id, String fname, String lname, int age, double wage, boolean active, ObservableList<String> activities, String country, String city, String street, String plz) {
+    public Worker(long id, String fname, String lname, int age, double wage, boolean active, List<String> activities, String country, String city, String street, String plz) {
         this.id.set(id);
         this.fname.set(fname);
         this.lname.set(lname);
         this.age.set(age);
         this.wage.set(wage);
         this.active.set(active);
-        this.activities.set(activities);
+        this.activities.set(FXCollections.observableArrayList(activities));
         this.country.set(country);
         this.city.set(city);
         this.street.set(street);
         this.plz.set(plz);
     }
+
+    public Worker(String fname, String lname, int age, double wage, boolean active, List<String> activities, String country, String city, String street, String plz) {
+        this.fname.set(fname);
+        this.lname.set(lname);
+        this.age.set(age);
+        this.wage.set(wage);
+        this.active.set(active);
+        this.activities.set(FXCollections.observableArrayList(activities));
+        this.country.set(country);
+        this.city.set(city);
+        this.street.set(street);
+        this.plz.set(plz);
+    }
+
 
     public Worker() {
     }
@@ -39,6 +59,9 @@ public class Worker {
     public LongProperty idProperty() {
         return id;
     }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
     public long getId() {
         return id.get();
     }
@@ -49,6 +72,7 @@ public class Worker {
     public StringProperty fnameProperty() {
         return fname;
     }
+    @Column(name="fname")
     public String getFname() {
         return fname.get();
     }
@@ -58,6 +82,7 @@ public class Worker {
     public StringProperty lnameProperty() {
         return lname;
     }
+    @Column(name="lname")
     public String getLname() {
         return lname.get();
     }
@@ -68,6 +93,7 @@ public class Worker {
     public IntegerProperty ageProperty() {
         return age;
     }
+    @Column(name="age")
     public int getAge() {
         return age.get();
     }
@@ -77,6 +103,7 @@ public class Worker {
     public DoubleProperty wageProperty() {
         return wage;
     }
+    @Column(name="wage")
     public double getWage() {
         return wage.get();
     }
@@ -86,6 +113,7 @@ public class Worker {
     public BooleanProperty activeProperty() {
         return active;
     }
+    @Column(name="active")
     public boolean isActive() {
         return active.get();
     }
@@ -96,17 +124,19 @@ public class Worker {
     public ListProperty<String> activitiesProperty() {
         return activities;
     }
-    public ObservableList<String> getActivities() {
+    @ElementCollection
+    public List<String> getActivities() {
         return activities.get();
     }
 
-    public void setActivities(ObservableList<String> activities) {
-        this.activities.set(activities);
+    public void setActivities(List<String> activities) {
+        this.activities.set(FXCollections.observableArrayList(activities));
     }
 
     public StringProperty countryProperty() {
         return country;
     }
+    @Column(name="country")
     public String getCountry() {
         return country.get();
     }
@@ -117,15 +147,18 @@ public class Worker {
     public StringProperty cityProperty() {
         return city;
     }
+    @Column(name="city")
     public String getCity() {
         return city.get();
     }
     public void setCity(String city) {
         this.city.set(city);
     }
+
     public StringProperty streetProperty() {
         return street;
     }
+    @Column(name="street")
     public String getStreet() {
         return street.get();
     }
@@ -136,6 +169,7 @@ public class Worker {
     public StringProperty plzProperty() {
         return plz;
     }
+    @Column(name="plz")
     public String getPlz() {
         return plz.get();
     }

@@ -4,22 +4,26 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import org.ddg.controller.WorkerCreateController;
 import org.ddg.controller.WorkerDetailsController;
 import org.ddg.controller.WorkerUpdateController;
 import org.ddg.dao.WorkerDAO;
-import org.ddg.dao.WorkerDAOMemImpl;
+import org.ddg.dao.WorkerDAOHibernateImpl;
 import org.ddg.model.Worker;
 import org.ddg.utils.Constants;
 
@@ -33,9 +37,10 @@ public class TableViewResultTabContent {
     private WorkerDAO dao;
     //controls
     private Button btnCreate;
+    private CheckBox cbTableEditable;
 
     public TableViewResultTabContent() {
-        dao = new WorkerDAOMemImpl();
+        dao = new WorkerDAOHibernateImpl();
         root = buildContent();
     }
 
@@ -64,12 +69,41 @@ public class TableViewResultTabContent {
 
     private void addComponents() {
        workerTableView = new TableView<>();
+      /*  workerTableView.getItems().addListener(new ListChangeListener<Worker>() {
+            @Override
+            public void onChanged(Change<? extends Worker> c) {
+                c.next();
+                if(c.wasUpdated()) {
+                    for(int i = c.getFrom(); i < c.getTo(); ++i) {
+                        Worker w = workerTableView.getItems().get(i);
+                        dao.update(w.getId(), w);
+                    }
+                }
+                if(c.wasAdded()) {
+                    for(Worker w: c.getAddedSubList()) {
+                        dao.create(w);
+                    }
+                }
+
+                if(c.wasRemoved()) {
+                    for(Worker w: c.getRemoved()) {
+                        dao.delete(w.getId());
+                    }
+                }
+
+                workerTableView.refresh();
+            }
+        });*/
        /*workerTableView.setColumnResizePolicy((param)-> true);
        Platform.runLater(()-> customResize(workerTableView));*/
        setupTableViewColumns();
+//       workerTableView.setRo
        addMockDataToTableView();
        ScrollPane center = new ScrollPane(workerTableView);
-       root.setCenter(center);
+       VBox boxCenter = new VBox();
+       cbTableEditable = new CheckBox("Make TableView editable");
+       boxCenter.getChildren().addAll(cbTableEditable, center);
+       root.setCenter(boxCenter);
        VBox vbControls = new VBox();
        btnCreate = new Button("Create New Worker");
        vbControls.getChildren().addAll(
@@ -79,28 +113,153 @@ public class TableViewResultTabContent {
                new Label("Ctrl+D => Delete selected Worker")
        );
        root.setBottom(vbControls);
+
+
+       workerTableView.editableProperty().bind(cbTableEditable.selectedProperty());
     }
 
     private void setupTableViewColumns() {
         TableColumn<Worker, String> fnameCol = new TableColumn<>("Fname");
         fnameCol.setCellValueFactory(new PropertyValueFactory<>("fname"));
         fnameCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        fnameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        fnameCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, String> event) {
+                ((Worker)event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())).setFname(event.getNewValue());
+                updateDAO(event.getTableView().getItems());
+            }
+        });
 
         TableColumn<Worker, String> lnameCol = new TableColumn<>("Lname");
         lnameCol.setCellValueFactory(new PropertyValueFactory<>("lname"));
         lnameCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        lnameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        lnameCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, String> event) {
+                ((Worker)event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())).setLname(event.getNewValue());
+                updateDAO(event.getTableView().getItems());
+            }
+        });
 
         TableColumn<Worker, Integer> ageCol = new TableColumn<>("Age");
         ageCol.setCellValueFactory(new PropertyValueFactory<>("age"));
         ageCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        ageCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Integer>() {
+            @Override
+            public String toString(Integer object) {
+                try {
+                    return object.toString();
+                } catch(NullPointerException ex) {
+                    return null;
+                }
+            }
+
+            @Override
+            public Integer fromString(String string) {
+                try {
+                    return Integer.parseInt(string);
+                } catch(NumberFormatException | NullPointerException ex) {
+                    return null;
+                }
+            }
+        }));
+        ageCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, Integer>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, Integer> event) {
+//                System.out.println(event.getOldValue()+ " => "+ event.getNewValue());
+                if(event.getNewValue() == null) {
+                    ((Worker)event.getTableView().getItems().get(
+                            event.getTablePosition().getRow())).setAge(event.getOldValue());
+                    //weird bug in javafx
+                    ageCol.setVisible(false);
+                    ageCol.setVisible(true);
+                } else {
+                    ((Worker)event.getTableView().getItems().get(
+                            event.getTablePosition().getRow())).setAge(event.getNewValue());
+                    updateDAO(event.getTableView().getItems());
+                }
+            }
+        });
 
         TableColumn<Worker, Double> wageCol = new TableColumn<>("Wage");
         wageCol.setCellValueFactory(new PropertyValueFactory<>("wage"));
         wageCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        wageCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Double>() {
+            @Override
+            public String toString(Double object) {
+                try {
+                    return object.toString();
+                } catch(NullPointerException ex) {
+                    return null;
+                }
+            }
+
+            @Override
+            public Double fromString(String string) {
+                try {
+                    return Double.parseDouble(string);
+                } catch(NumberFormatException| NullPointerException ex) {
+                    return null;
+                }
+            }
+        }));
+        wageCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, Double>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, Double> event) {
+                if(event.getNewValue() == null) {
+                    ((Worker)event.getTableView().getItems().get(
+                            event.getTablePosition().getRow())).setWage(event.getOldValue());
+                    //weird bug in javafx
+                    ageCol.setVisible(false);
+                    ageCol.setVisible(true);
+                } else {
+                    ((Worker)event.getTableView().getItems().get(
+                            event.getTablePosition().getRow())).setWage(event.getNewValue());
+                    updateDAO(event.getTableView().getItems());
+                }
+            }
+        });
 
         TableColumn<Worker, Boolean> activeCol = new TableColumn<>("Active");
         activeCol.setCellValueFactory(new PropertyValueFactory<>("active"));
         activeCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        activeCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Boolean>() {
+            @Override
+            public String toString(Boolean object) {
+                try {
+                    return object.toString();
+                } catch(NullPointerException ex) {
+                    return null;
+                }
+            }
+
+            @Override
+            public Boolean fromString(String string) {
+                if(string.equalsIgnoreCase("true")) return true;
+                else if(string.equalsIgnoreCase("false")) return false;
+                return null;
+            }
+        }));
+        activeCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, Boolean>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, Boolean> event) {
+                if(event.getNewValue() == null) {
+                    ((Worker)event.getTableView().getItems().get(
+                            event.getTablePosition().getRow())).setActive(event.getOldValue());
+                    //weird bug in javafx
+                    ageCol.setVisible(false);
+                    ageCol.setVisible(true);
+                } else {
+                    ((Worker)event.getTableView().getItems().get(
+                            event.getTablePosition().getRow())).setActive(event.getNewValue());
+                    updateDAO(event.getTableView().getItems());
+                }
+            }
+        });
 
         TableColumn<Worker, ObservableList<String>> activitiesCol = new TableColumn<>("Activities");
 //        activitiesCol.setCellValueFactory(new PropertyValueFactory<>("activities"));
@@ -135,25 +294,62 @@ public class TableViewResultTabContent {
         TableColumn<Worker, String> countryCol = new TableColumn<>("Country");
         countryCol.setCellValueFactory(new PropertyValueFactory<>("country"));
         countryCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        countryCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        countryCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, String> event) {
+                ((Worker)event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())).setCountry(event.getNewValue());
+                updateDAO(event.getTableView().getItems());
+            }
+        });
 
         TableColumn<Worker, String> cityCol = new TableColumn<>("City");
         cityCol.setCellValueFactory(new PropertyValueFactory<>("city"));
         cityCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        cityCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        cityCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, String> event) {
+                ((Worker)event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())).setCity(event.getNewValue());
+                updateDAO(event.getTableView().getItems());
+            }
+        });
 
         TableColumn<Worker, String> streetCol = new TableColumn<>("Street");
         streetCol.setCellValueFactory(new PropertyValueFactory<>("street"));
         streetCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        streetCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        streetCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, String> event) {
+                ((Worker)event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())).setStreet(event.getNewValue());
+                updateDAO(event.getTableView().getItems());
+            }
+        });
 
         TableColumn<Worker, String> plzCol = new TableColumn<>("PLZ");
         plzCol.setCellValueFactory(new PropertyValueFactory<>("plz"));
         plzCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
+        plzCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        plzCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Worker, String> event) {
+                ((Worker)event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())).setPlz(event.getNewValue());
+                updateDAO(event.getTableView().getItems());
+            }
+        });
 
         workerTableView.getColumns().addAll(fnameCol, lnameCol, ageCol, wageCol, activeCol,
                 activitiesCol, countryCol, cityCol, streetCol, plzCol);
+
     }
 
     private void addMockDataToTableView() {
-        dao.create(new Worker(1L, "foo", "bar", 10, 100.0,
+        dao.create(new Worker(1L,"foo", "bar", 10, 100.0,
                 true, FXCollections.observableArrayList("Reading", "Writing"), "Germany",
                 "Bochum","Laerholzstrasse", "1234"));
         dao.create(new Worker(2L, "leo", "messi", 20, 200.0,
@@ -168,6 +364,25 @@ public class TableViewResultTabContent {
     private void refreshTable() {
         workerTableView.getItems().clear();
         workerTableView.getItems().addAll(dao.findAll());
+    }
+
+    private void updateDAO(ObservableList<Worker> items) {
+//        dao.clear();
+        items.forEach(w-> dao.update(w.getId(),w));
+    }
+
+    public void setScene(Scene scene) {
+        ((Stage)scene.getWindow()).setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                try {
+                    ((WorkerDAOHibernateImpl)dao).closeSessionFactory();
+                } catch(Exception ex) {
+                } finally {
+                    ((Stage)scene.getWindow()).close();
+                }
+            }
+        });
     }
 
     private void registerEvents() {

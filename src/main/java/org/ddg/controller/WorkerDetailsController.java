@@ -38,7 +38,7 @@ public class WorkerDetailsController {
         fieldCity.setText(selectedWorker.getCity());
         fieldStreet.setText(selectedWorker.getStreet());
         fieldPlz.setText(selectedWorker.getPlz());
-        lvActivities.setItems(selectedWorker.getActivities());
+        lvActivities.setItems(FXCollections.observableArrayList(selectedWorker.getActivities()));
     }
     @FXML
     public void initialize() {

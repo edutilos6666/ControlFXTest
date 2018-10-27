@@ -23,4 +23,5 @@ public interface WorkerDAO {
     List<Worker> findByStreet(String street);
     List<Worker> findByPlz(String plz);
     List<Worker> findAll();
+    void clear();
 }

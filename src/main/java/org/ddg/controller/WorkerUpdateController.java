@@ -41,9 +41,10 @@ public class WorkerUpdateController {
         fieldCity.setText(worker.getCity());
         fieldStreet.setText(worker.getStreet());
         fieldPlz.setText(worker.getPlz());
-        worker.getActivities().forEach(act-> {
+        //because of hibernate
+   /*     worker.getActivities().forEach(act-> {
             lvActivities.getSelectionModel().select(act);
-        });
+        });*/
     }
     @FXML
     public void initialize() {

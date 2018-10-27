@@ -1,5 +1,6 @@
 package org.ddg.tabs;
 
+import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import org.ddg.tabs.content.TableViewResultTabContent;
 import org.ddg.utils.JavafxUtils;
@@ -10,11 +11,26 @@ import java.util.List;
 import static org.ddg.tabs.TabNamesEnum.RESULT;
 
 public class TableViewTabs implements ITabsGenerator{
+    private TableViewResultTabContent tableViewResultTabContent;
+    private Tab tabResult, tabSourceCode, tabCss,tabJavaDoc;
+
+    public TableViewTabs() {
+        tabResult = getResultTab();
+        tabSourceCode = getSourceCodeTab();
+        tabCss = getCSSTab();
+        tabJavaDoc = getJavaDocTab();
+    }
+
     @Override
     public Tab getResultTab() {
         Tab tab = new Tab(RESULT);
-        tab.setContent(new TableViewResultTabContent().buildContent());
+        tableViewResultTabContent = new TableViewResultTabContent();
+        tab.setContent(tableViewResultTabContent.buildContent());
         return tab;
+    }
+
+    public void setScene(Scene scene) {
+        tableViewResultTabContent.setScene(scene);
     }
 
     @Override
@@ -36,6 +52,6 @@ public class TableViewTabs implements ITabsGenerator{
 
     @Override
     public List<Tab> getAllTabs() {
-        return Arrays.asList(getResultTab(), getSourceCodeTab(), getCSSTab(), getJavaDocTab());
+        return Arrays.asList(tabResult, tabSourceCode, tabCss, tabJavaDoc);
     }
 }

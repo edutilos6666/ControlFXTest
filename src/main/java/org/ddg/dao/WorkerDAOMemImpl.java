@@ -18,6 +18,7 @@ public class WorkerDAOMemImpl implements WorkerDAO {
         this.workerMap = new ConcurrentHashMap<>();
     }
 
+    @Override
     public void clear() {
         workerMap.clear();
     }

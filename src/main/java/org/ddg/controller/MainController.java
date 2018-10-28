@@ -91,7 +91,9 @@ public class MainController {
                 new CustomListItem(new Label("TableView"), tableViewTabs),
                 new CustomListItem(new Label("TreeView"), new TreeViewTabs()),
                 new CustomListItem(new Label("TableViewWithProperty"), tableViewTabsWithProperty),
-                new CustomListItem(new Label("TableViewWithDate"), tableViewTabsWithDate)
+                new CustomListItem(new Label("TableViewWithDate"), tableViewTabsWithDate),
+                new CustomListItem(new Label("ControlsFX TextFields"), new ControlsFXTextFieldsTabs()),
+                new CustomListItem(new Label("ControlsFX TableViewWithTableFilter"), new TableViewTabsWithTableFilter())
         );
         listContent.addAll(items);
         refreshListView(listContent);

@@ -14,6 +14,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -39,6 +40,7 @@ public class TableViewResultTabContentWithProperty {
     //controls
     private Button btnCreate;
     private CheckBox cbTableEditable;
+    private Button btnRefreshTable;
 
     public TableViewResultTabContentWithProperty() {
         dao = new WorkerDAOHibernateImpl();
@@ -102,8 +104,11 @@ public class TableViewResultTabContentWithProperty {
        addMockDataToTableView();
        ScrollPane center = new ScrollPane(workerTableView);
        VBox boxCenter = new VBox();
+       HBox hbCenter = new HBox();
        cbTableEditable = new CheckBox("Make TableView editable");
-       boxCenter.getChildren().addAll(cbTableEditable, center);
+       btnRefreshTable = new Button("Refresh Table");
+       hbCenter.getChildren().addAll(cbTableEditable, btnRefreshTable);
+       boxCenter.getChildren().addAll(hbCenter, center);
        root.setCenter(boxCenter);
        VBox vbControls = new VBox();
        btnCreate = new Button("Create New Worker");
@@ -464,6 +469,10 @@ public class TableViewResultTabContentWithProperty {
 
         btnCreate.setOnAction(e-> {
             showWorkerCreateWindow();
+        });
+
+        btnRefreshTable.setOnAction(e-> {
+            refreshTable();
         });
 
     }

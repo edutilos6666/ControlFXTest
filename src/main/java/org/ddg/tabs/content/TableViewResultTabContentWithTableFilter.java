@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import org.controlsfx.control.table.TableFilter;
 import org.ddg.controller.WorkerCreateController;
 import org.ddg.controller.WorkerDetailsController;
 import org.ddg.controller.WorkerUpdateController;
@@ -32,7 +33,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-public class TableViewResultTabContent {
+public class TableViewResultTabContentWithTableFilter {
     private BorderPane root;
     private TableView<Worker> workerTableView;
     private WorkerDAO dao;
@@ -41,7 +42,7 @@ public class TableViewResultTabContent {
     private CheckBox cbTableEditable;
     private Button btnRefreshTable;
 
-    public TableViewResultTabContent() {
+    public TableViewResultTabContentWithTableFilter() {
         dao = new WorkerDAOHibernateImpl();
         root = buildContent();
     }
@@ -121,7 +122,7 @@ public class TableViewResultTabContent {
 
 
        workerTableView.editableProperty().bind(cbTableEditable.selectedProperty());
-//       TableFilter<Worker> filter = TableFilter.<Worker>forTableView(workerTableView).apply();
+       TableFilter<Worker> filter = TableFilter.<Worker>forTableView(workerTableView).apply();
     }
 
     private void setupTableViewColumns() {
@@ -449,7 +450,7 @@ public class TableViewResultTabContent {
         });
 
         btnRefreshTable.setOnAction(e-> {
-           refreshTable();
+            refreshTable();
         });
 
     }

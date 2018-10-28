@@ -8,10 +8,13 @@
 }
 
 
+
 * {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
+
+/*
 .text-field {
     -fx-pref-width: 300px;
     -fx-pref-height: 50px;
@@ -19,12 +22,13 @@
     -fx-border-width: 3px;
 }
 
+*/
 .button {
     -fx-background-color: blue;
     -fx-text-fill: white;
     -fx-padding: 10px 20px;
-    /*-fx-scale-x: 1.0;*/
-    /*-fx-scale-y: 1.0;*/
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 
 .button:hover {
@@ -34,6 +38,7 @@
     -fx-scale-x: 1.2;
     -fx-scale-y: 1.2;
 }
+
 
 /*
 .button:cancel {

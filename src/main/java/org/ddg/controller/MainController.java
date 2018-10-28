@@ -35,6 +35,8 @@ public class MainController {
     private List<CustomListItem> listContent = new ArrayList<>();
 
     private TableViewTabs tableViewTabs;
+    private TableViewTabsWithProperty tableViewTabsWithProperty;
+    private TableViewTabsWithDate tableViewTabsWithDate;
 
     public void registerKeyBindings(Scene scene) {
         KeyCombination keyCombination = new KeyCodeCombination(
@@ -52,6 +54,8 @@ public class MainController {
         });
 
         tableViewTabs.setScene(scene);
+        tableViewTabsWithProperty.setScene(scene);
+        tableViewTabsWithDate.setScene(scene);
     }
 
     @FXML
@@ -79,11 +83,15 @@ public class MainController {
         });
         listItems.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tableViewTabs = new TableViewTabs();
+        tableViewTabsWithProperty = new TableViewTabsWithProperty();
+        tableViewTabsWithDate = new TableViewTabsWithDate();
         ObservableList<CustomListItem> items = FXCollections.observableArrayList(
                 new CustomListItem(new Label("GridPane"), new GridPaneTabs()),
                 new CustomListItem(new Label("VBoxHBox"), new VBoxHBoxTabs()),
                 new CustomListItem(new Label("TableView"), tableViewTabs),
-                new CustomListItem(new Label("TreeView"), new TreeViewTabs())
+                new CustomListItem(new Label("TreeView"), new TreeViewTabs()),
+                new CustomListItem(new Label("TableViewWithProperty"), tableViewTabsWithProperty),
+                new CustomListItem(new Label("TableViewWithDate"), tableViewTabsWithDate)
         );
         listContent.addAll(items);
         refreshListView(listContent);

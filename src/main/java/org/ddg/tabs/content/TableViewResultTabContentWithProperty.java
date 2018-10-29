@@ -378,7 +378,7 @@ public class TableViewResultTabContentWithProperty {
     }
 
     private void addMockDataToTableView() {
-        dao.create(new Worker(1L,"foo", "bar", 10, 100.0,
+/*        dao.create(new Worker(1L,"foo", "bar", 10, 100.0,
                 true, FXCollections.observableArrayList("Reading", "Writing"), "Germany",
                 "Bochum","Laerholzstrasse", "1234"));
         dao.create(new Worker(2L, "leo", "messi", 20, 200.0,
@@ -386,7 +386,18 @@ public class TableViewResultTabContentWithProperty {
                 "Barcelona", "Catalonia", "23456"));
         dao.create(new Worker(3L, "cris", "tiano", 30, 300.0,
                 true, FXCollections.observableArrayList("Reading", "Listening"), "Italy",
+                "Turin", "Juventus", "34567"));*/
+
+        workerTableView.getItems().add(new Worker(1L,"foo", "bar", 10, 100.0,
+                true, FXCollections.observableArrayList("Reading", "Writing"), "Germany",
+                "Bochum","Laerholzstrasse", "1234"));
+        workerTableView.getItems().add(new Worker(2L, "leo", "messi", 20, 200.0,
+                false, FXCollections.observableArrayList("Speaking", "Listening"), "Spain",
+                "Barcelona", "Catalonia", "23456"));
+        workerTableView.getItems().add(new Worker(3L, "cris", "tiano", 30, 300.0,
+                true, FXCollections.observableArrayList("Reading", "Listening"), "Italy",
                 "Turin", "Juventus", "34567"));
+
         workerTableView.getItems().addAll(dao.findAll());
     }
 

@@ -99,7 +99,11 @@ public class MainController {
                 new CustomListItem(new Label("ControlsFX TableViewWithTableFilter"), new TableViewTabsWithTableFilter()),
                 new CustomListItem(new Label("SimpleFormTabs"), new SimpleFormTabs()),
                 new CustomListItem(new Label("TaskExampleTabs"), new TaskExampleTabs()),
-                new CustomListItem(new Label("TableViewWithDelay"), tableViewTabsWithDelay)
+                new CustomListItem(new Label("TableViewWithDelay"), tableViewTabsWithDelay),
+                new CustomListItem(new Label("ParallelTransitionTabs"), new ParallelTransitionTabs()),
+                new CustomListItem(new Label("ParallelTransitionTimelineTabs"), new ParallelTransitionTimelineTabs()),
+                new CustomListItem(new Label("SequentialTransitionTabs"), new SequentialTransitionTabs()),
+                new CustomListItem(new Label("SequentialTransitionTimelineTabs"), new SequentialTransitionTimelineTabs())
         );
         listContent.addAll(items);
         refreshListView(listContent);

@@ -1,4 +1,4 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javafx.animation.*;
 import javafx.application.Application;
@@ -17,7 +17,7 @@ import javafx.util.Duration;
 /**
  * Created by edutilos on 01.11.18.
  */
-public class SequentialTransitionTimelineExample extends Application {
+public class ParallelTransitionTimelineExample extends Application {
     public static void main(String[] args) {
         launch(args);
     }
@@ -26,13 +26,13 @@ public class SequentialTransitionTimelineExample extends Application {
         addComponents();
         registerEvents();
         primaryStage.setScene(scene);
-        primaryStage.setTitle("SequentialTransition Timeline Example");
+        primaryStage.setTitle("ParallelTransition Timeline Example");
         primaryStage.show();
     }
     private Scene scene;
     private VBox root;
     private Circle circle;
-    private SequentialTransition sequentialTransition;
+    private ParallelTransition parallelTransition;
     private Timeline tl1, tl2, tl3;
     private HBox hbControls;
     private Button btnPlay, btnPlayFromStart, btnStop, btnPause;
@@ -69,8 +69,8 @@ public class SequentialTransitionTimelineExample extends Application {
         KeyFrame kf3 = new KeyFrame(Duration.seconds(2), kv3);
         tl3.getKeyFrames().add(kf3);
 
-        sequentialTransition = new SequentialTransition();
-        sequentialTransition.getChildren().addAll(tl1, tl2, tl3);
+        parallelTransition = new ParallelTransition();
+        parallelTransition.getChildren().addAll(tl1, tl2, tl3);
 
         hbControls = new HBox();
         btnPlay = new Button("Play");
@@ -86,10 +86,10 @@ public class SequentialTransitionTimelineExample extends Application {
     }
 
     private void registerEvents() {
-        sequentialTransition.setOnFinished(evt-> {
-            System.out.println("SequentialTransition finished.");
+        parallelTransition.setOnFinished(evt-> {
+            System.out.println("ParallelTransition finished.");
         });
-        sequentialTransition.statusProperty().addListener(new ChangeListener<Animation.Status>() {
+        parallelTransition.statusProperty().addListener(new ChangeListener<Animation.Status>() {
             @Override
             public void changed(ObservableValue<? extends Animation.Status> observable, Animation.Status oldValue, Animation.Status newValue) {
                 if(newValue == Animation.Status.RUNNING) {
@@ -112,16 +112,16 @@ public class SequentialTransitionTimelineExample extends Application {
         });
 
         btnPlay.setOnAction(evt-> {
-            sequentialTransition.play();
+            parallelTransition.play();
         });
         btnPlayFromStart.setOnAction(evt-> {
-            sequentialTransition.playFromStart();
+            parallelTransition.playFromStart();
         });
         btnPause.setOnAction(evt-> {
-            sequentialTransition.pause();
+            parallelTransition.pause();
         });
         btnStop.setOnAction(evt-> {
-            sequentialTransition.stop();
+            parallelTransition.stop();
         });
     }
 }

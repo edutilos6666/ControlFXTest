@@ -1,4 +1,4 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import java.util.Arrays;
 import java.util.List;

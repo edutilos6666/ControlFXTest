@@ -1,4 +1,4 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;

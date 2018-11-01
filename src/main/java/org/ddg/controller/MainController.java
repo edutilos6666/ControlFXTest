@@ -37,6 +37,7 @@ public class MainController {
     private TableViewTabs tableViewTabs;
     private TableViewTabsWithProperty tableViewTabsWithProperty;
     private TableViewTabsWithDate tableViewTabsWithDate;
+    private TableViewTabsWithDelay tableViewTabsWithDelay;
 
     public void registerKeyBindings(Scene scene) {
         KeyCombination keyCombination = new KeyCodeCombination(
@@ -56,6 +57,7 @@ public class MainController {
         tableViewTabs.setScene(scene);
         tableViewTabsWithProperty.setScene(scene);
         tableViewTabsWithDate.setScene(scene);
+        tableViewTabsWithDelay.setScene(scene);
     }
 
     @FXML
@@ -85,6 +87,7 @@ public class MainController {
         tableViewTabs = new TableViewTabs();
         tableViewTabsWithProperty = new TableViewTabsWithProperty();
         tableViewTabsWithDate = new TableViewTabsWithDate();
+        tableViewTabsWithDelay = new TableViewTabsWithDelay();
         ObservableList<CustomListItem> items = FXCollections.observableArrayList(
                 new CustomListItem(new Label("GridPane"), new GridPaneTabs()),
                 new CustomListItem(new Label("VBoxHBox"), new VBoxHBoxTabs()),
@@ -95,7 +98,8 @@ public class MainController {
                 new CustomListItem(new Label("ControlsFX TextFields"), new ControlsFXTextFieldsTabs()),
                 new CustomListItem(new Label("ControlsFX TableViewWithTableFilter"), new TableViewTabsWithTableFilter()),
                 new CustomListItem(new Label("SimpleFormTabs"), new SimpleFormTabs()),
-                new CustomListItem(new Label("TaskExampleTabs"), new TaskExampleTabs())
+                new CustomListItem(new Label("TaskExampleTabs"), new TaskExampleTabs()),
+                new CustomListItem(new Label("TableViewWithDelay"), tableViewTabsWithDelay)
         );
         listContent.addAll(items);
         refreshListView(listContent);

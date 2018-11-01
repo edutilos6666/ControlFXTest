@@ -2,7 +2,9 @@ package org.ddg.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -95,8 +97,22 @@ public class WorkerCreateController {
             String street = fieldStreet.getText();
             String plz = fieldPlz.getText();
 //            dao.create(new Worker(id, fname, lname, age, wage, active, activities, country, city, street, plz));
-            dao.create(new Worker(fname, lname, age, wage, active, activities, country, city, street, plz));
-            closeScene();
+            Scene scene = fieldAge.getScene();
+            if(scene == null) return;
+            scene.setCursor(Cursor.WAIT);
+            Task<Void> task = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    dao.create(new Worker(fname, lname, age, wage, active, activities, country, city, street, plz));
+                    return null;
+                }
+            };
+            task.setOnSucceeded(evt-> {
+                scene.setCursor(Cursor.DEFAULT);
+                closeScene();
+            });
+
+            new Thread(task).start();
         } catch(Exception ex) {
             CustomAlerts.showErrorAlert(ex.getMessage());
         }

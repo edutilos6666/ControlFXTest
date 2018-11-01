@@ -103,7 +103,14 @@ public class MainController {
                 new CustomListItem(new Label("ParallelTransitionTabs"), new ParallelTransitionTabs()),
                 new CustomListItem(new Label("ParallelTransitionTimelineTabs"), new ParallelTransitionTimelineTabs()),
                 new CustomListItem(new Label("SequentialTransitionTabs"), new SequentialTransitionTabs()),
-                new CustomListItem(new Label("SequentialTransitionTimelineTabs"), new SequentialTransitionTimelineTabs())
+                new CustomListItem(new Label("SequentialTransitionTimelineTabs"), new SequentialTransitionTimelineTabs()),
+                new CustomListItem(new Label("AreaChartTabs"), new AreaChartTabs()),
+                new CustomListItem(new Label("BarChartTabs"), new BarChartTabs()),
+                new CustomListItem(new Label("LineChartTabs"), new LineChartTabs()),
+                new CustomListItem(new Label("PieChartTabs"), new PieChartTabs()),
+                new CustomListItem(new Label("ScatterChartTabs"), new ScatterChartTabs()),
+                new CustomListItem(new Label("StackedAreaChartTabs"), new StackedAreaChartTabs()),
+                new CustomListItem(new Label("StackedBarChartTabs"), new StackedBarChartTabs())
         );
         listContent.addAll(items);
         refreshListView(listContent);

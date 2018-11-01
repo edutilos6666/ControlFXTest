@@ -1,10 +1,9 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.CubicCurveTo;

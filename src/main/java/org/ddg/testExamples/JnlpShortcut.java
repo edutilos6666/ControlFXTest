@@ -1,4 +1,4 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javax.jnlp.IntegrationService;
 import javax.jnlp.ServiceManager;

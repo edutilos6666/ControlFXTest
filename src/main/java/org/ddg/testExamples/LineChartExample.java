@@ -1,9 +1,9 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.chart.StackedAreaChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * Created by edutilos on 01.11.18.
  */
-public class StackedAreaChartExample extends Application {
+public class LineChartExample extends Application {
     public static void main(String[] args) {
         launch(args);
     }
@@ -24,30 +24,30 @@ public class StackedAreaChartExample extends Application {
     public void start(Stage primaryStage) throws Exception {
         addComponents();
         primaryStage.setScene(scene);
-        primaryStage.setTitle("StackedAreaChart Example");
+        primaryStage.setTitle("LineChart Example");
         primaryStage.show();
     }
 
     private Scene scene;
     private VBox root;
     private Label lblTitle;
-    private StackedAreaChart<Number, Number> stackedAreaChart;
+    private LineChart<Number, Number> lineChart;
 
     private void addComponents() {
         root = new VBox();
         scene = new Scene(root, 500, 500);
-        lblTitle = new Label("StackedAreaChart Example");
+        lblTitle = new Label("LineChart Example");
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("Cities");
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Population Size");
 
-        stackedAreaChart = new StackedAreaChart<Number, Number>(xAxis, yAxis);
+        lineChart = new LineChart<Number, Number>(xAxis, yAxis);
         List<String> cities = Arrays.asList("Baku", "Istanbul", "Ankara", "Gence", "Moscow", "Berlin");
         cities.forEach(city-> {
-            stackedAreaChart.getData().add(generateRandomDataSeries(city));
+            lineChart.getData().add(generateRandomDataSeries(city));
         });
-        root.getChildren().addAll(lblTitle, stackedAreaChart);
+        root.getChildren().addAll(lblTitle, lineChart);
     }
 
     private XYChart.Series<Number,Number> generateRandomDataSeries(String name) {

@@ -1,8 +1,8 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
+import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * Created by edutilos on 01.11.18.
  */
-public class BarChartExample extends Application {
+public class StackedBarChartExample extends Application {
     public static void main(String[] args) {
         launch(args);
     }
@@ -25,30 +25,30 @@ public class BarChartExample extends Application {
     public void start(Stage primaryStage) throws Exception {
         addComponents();
         primaryStage.setScene(scene);
-        primaryStage.setTitle("BarChart Example");
+        primaryStage.setTitle("StackedBarChart Example");
         primaryStage.show();
     }
 
     private Scene scene;
     private VBox root;
     private Label lblTitle;
-    private BarChart<String, Number> barChart;
+    private StackedBarChart<String, Number> stackedBarChart;
 
     private void addComponents() {
         root = new VBox();
         scene = new Scene(root, 500, 500);
-        lblTitle = new Label("BarChart Example");
+        lblTitle = new Label("StackedBarChart Example");
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Browsers");
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Market Value");
 
-        barChart = new BarChart<String, Number>(xAxis, yAxis);
+        stackedBarChart = new StackedBarChart<String, Number>(xAxis, yAxis);
         List<Integer> years = Arrays.asList(2014, 2015, 2016, 2017, 2018, 2019);
         years.forEach(year-> {
-            barChart.getData().add(generateRandomDataSeries(String.valueOf(year)));
+            stackedBarChart.getData().add(generateRandomDataSeries(String.valueOf(year)));
         });
-        root.getChildren().addAll(lblTitle, barChart);
+        root.getChildren().addAll(lblTitle, stackedBarChart);
     }
 
     private XYChart.Series<String,Number> generateRandomDataSeries(String name) {

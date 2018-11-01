@@ -1,10 +1,9 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Point3D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -21,7 +20,7 @@ import javafx.util.Duration;
 /**
  * Created by edutilos on 01.11.18.
  */
-public class ParallelTransitionExample extends Application {
+public class SequentialTransitionExample extends Application {
     public static void main(String[] args) {
         launch(args);
     }
@@ -30,10 +29,9 @@ public class ParallelTransitionExample extends Application {
         addComponents();
         primaryStage.setScene(scene);
         registerEvents();
-        primaryStage.setTitle("ParallelTransition Example");
+        primaryStage.setTitle("SequentialTransition Example");
         primaryStage.show();
     }
-
 
     private Scene scene;
     private VBox root;
@@ -45,7 +43,7 @@ public class ParallelTransitionExample extends Application {
     private ScaleTransition scaleTransition;
     private FillTransition fillTransition;
     private StrokeTransition strokeTransition;
-    private ParallelTransition parallelTransition;
+    private SequentialTransition sequentialTransition;
     private HBox hbControls;
     private Button btnPlay, btnPlayFromStart, btnPause, btnStop;
 
@@ -81,13 +79,13 @@ public class ParallelTransitionExample extends Application {
         strokeTransition = new StrokeTransition(Duration.seconds(5), rect, Color.GREEN,Color.BLUE);
         strokeTransition.setAutoReverse(true);
         strokeTransition.setCycleCount(2);
-        parallelTransition = new ParallelTransition();
-        parallelTransition.getChildren().addAll(pathTransition, rotateTransition, scaleTransition,
+        sequentialTransition = new SequentialTransition();
+        sequentialTransition.getChildren().addAll(pathTransition, rotateTransition, scaleTransition,
                 fillTransition, strokeTransition);
-        parallelTransition.setOnFinished(evt-> {
-            System.out.println("ParallelTransition finished.");
+        sequentialTransition.setOnFinished(evt-> {
+            System.out.println("SequentialTransition finished.");
         });
-//        parallelTransition.play();
+//        sequentialTransition.play();
 
         //controls
         hbControls = new HBox();
@@ -104,7 +102,7 @@ public class ParallelTransitionExample extends Application {
     }
 
     private void registerEvents() {
-        parallelTransition.statusProperty().addListener(new ChangeListener<Animation.Status>() {
+        sequentialTransition.statusProperty().addListener(new ChangeListener<Animation.Status>() {
             @Override
             public void changed(ObservableValue<? extends Animation.Status> observable, Animation.Status oldValue, Animation.Status newValue) {
                 if(newValue == Animation.Status.STOPPED) {
@@ -126,16 +124,16 @@ public class ParallelTransitionExample extends Application {
             }
         });
         btnPlay.setOnAction(evt-> {
-            parallelTransition.play();
+            sequentialTransition.play();
         });
         btnPlayFromStart.setOnAction(evt-> {
-            parallelTransition.playFromStart();
+            sequentialTransition.playFromStart();
         });
         btnStop.setOnAction(evt-> {
-            parallelTransition.stop();
+            sequentialTransition.stop();
         });
         btnPause.setOnAction(evt-> {
-            parallelTransition.pause();
+            sequentialTransition.pause();
         });
     }
 }

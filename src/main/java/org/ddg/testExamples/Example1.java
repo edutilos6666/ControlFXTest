@@ -1,7 +1,6 @@
-package org.ddg.taskExamples;
+package org.ddg.testExamples;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;

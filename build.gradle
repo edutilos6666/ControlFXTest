@@ -16,6 +16,9 @@ version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+//compileJava.options.fork = true
+//compileJava.options.forkOptions.executable = '/home/edutilos/Applications/jdk1.8.0_131/bin/javac'
+
 repositories {
     mavenCentral()
 }

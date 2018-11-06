@@ -107,7 +107,7 @@ public class TableViewResultTabContentWithDate {
        Platform.runLater(()-> customResize(workerTableView));*/
        setupTableViewColumns();
 //       workerTableView.setRo
-       addMockDataToTableView();
+//       addMockDataToTableView();
        ScrollPane center = new ScrollPane(workerTableView);
        VBox boxCenter = new VBox();
        HBox hbCenter = new HBox();

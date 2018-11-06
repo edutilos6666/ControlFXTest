@@ -1,17 +1,21 @@
 package org.ddg.tabs.content;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -26,24 +30,30 @@ import org.ddg.controller.WorkerDetailsController;
 import org.ddg.controller.WorkerUpdateController;
 import org.ddg.dao.WorkerDAO;
 import org.ddg.dao.WorkerDAOHibernateImpl;
+import org.ddg.dao.WorkerDAOMemImpl;
 import org.ddg.model.Worker;
 import org.ddg.utils.Constants;
+import org.ddg.utils.CustomDialogs;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-public class TableViewResultTabContentWithProperty {
+public class TableViewWithSelectionHaltResultTabContent {
     private BorderPane root;
     private TableView<Worker> workerTableView;
+    private BooleanProperty tableCellChanged = new SimpleBooleanProperty(false);
+    private TableView.TableViewSelectionModel<Worker> workerTableViewSelectionModel;
     private WorkerDAO dao;
     //controls
     private Button btnCreate;
     private CheckBox cbTableEditable;
     private Button btnRefreshTable;
 
-    public TableViewResultTabContentWithProperty() {
-        dao = new WorkerDAOHibernateImpl();
+    public TableViewWithSelectionHaltResultTabContent() {
+//        dao = new WorkerDAOHibernateImpl();
+        dao = new WorkerDAOMemImpl();
         root = buildContent();
     }
 
@@ -52,6 +62,7 @@ public class TableViewResultTabContentWithProperty {
         addComponents();
         root.getStylesheets().add("org/ddg/tabs/content/tableViewResultTabContent.css");
         registerEvents();
+        workerTableViewSelectionModel = workerTableView.getSelectionModel();
         return root;
     }
 
@@ -72,7 +83,7 @@ public class TableViewResultTabContentWithProperty {
 
     private void addComponents() {
        workerTableView = new TableView<>();
-        workerTableView.getItems().addListener(new ListChangeListener<Worker>() {
+      /*  workerTableView.getItems().addListener(new ListChangeListener<Worker>() {
             @Override
             public void onChanged(Change<? extends Worker> c) {
                 c.next();
@@ -96,12 +107,12 @@ public class TableViewResultTabContentWithProperty {
 
                 workerTableView.refresh();
             }
-        });
+        });*/
        /*workerTableView.setColumnResizePolicy((param)-> true);
        Platform.runLater(()-> customResize(workerTableView));*/
        setupTableViewColumns();
 //       workerTableView.setRo
-//       addMockDataToTableView();
+       addMockDataToTableView();
        ScrollPane center = new ScrollPane(workerTableView);
        VBox boxCenter = new VBox();
        HBox hbCenter = new HBox();
@@ -122,19 +133,12 @@ public class TableViewResultTabContentWithProperty {
 
 
        workerTableView.editableProperty().bind(cbTableEditable.selectedProperty());
-//       that does not work, change is not saved into table, because Change is not detected
-//       workerTableView.getItems().get(0).setFname("new-foo");
+//       TableFilter<Worker> filter = TableFilter.<Worker>forTableView(workerTableView).apply();
     }
 
     private void setupTableViewColumns() {
         TableColumn<Worker, String> fnameCol = new TableColumn<>("Fname");
-//        fnameCol.setCellValueFactory(new PropertyValueFactory<>("fnameProperty"));
-        fnameCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Worker, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Worker, String> param) {
-                return param.getValue().fnameProperty();
-            }
-        });
+        fnameCol.setCellValueFactory(new PropertyValueFactory<>("fname"));
         fnameCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
         fnameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         fnameCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
@@ -143,17 +147,12 @@ public class TableViewResultTabContentWithProperty {
                 ((Worker)event.getTableView().getItems().get(
                         event.getTablePosition().getRow())).setFname(event.getNewValue());
                 updateDAO(event.getTableView().getItems());
+                tableCellChanged.set(true);
             }
         });
 
         TableColumn<Worker, String> lnameCol = new TableColumn<>("Lname");
-//        lnameCol.setCellValueFactory(new PropertyValueFactory<>("lnameProperty"));
-        lnameCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Worker, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Worker, String> param) {
-                return param.getValue().lnameProperty();
-            }
-        });
+        lnameCol.setCellValueFactory(new PropertyValueFactory<>("lname"));
         lnameCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
         lnameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         lnameCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
@@ -162,16 +161,16 @@ public class TableViewResultTabContentWithProperty {
                 ((Worker)event.getTableView().getItems().get(
                         event.getTablePosition().getRow())).setLname(event.getNewValue());
                 updateDAO(event.getTableView().getItems());
+                tableCellChanged.set(true);
             }
         });
 
-        TableColumn<Worker, Number> ageCol = new TableColumn<>("Age");
-//        ageCol.setCellValueFactory(new PropertyValueFactory<>("ageProperty"));
-        ageCol.setCellValueFactory(param-> param.getValue().ageProperty());
+        TableColumn<Worker, Integer> ageCol = new TableColumn<>("Age");
+        ageCol.setCellValueFactory(new PropertyValueFactory<>("age"));
         ageCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
-        ageCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Number>() {
+        ageCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Integer>() {
             @Override
-            public String toString(Number object) {
+            public String toString(Integer object) {
                 try {
                     return object.toString();
                 } catch(NullPointerException ex) {
@@ -180,41 +179,39 @@ public class TableViewResultTabContentWithProperty {
             }
 
             @Override
-            public Number fromString(String string) {
+            public Integer fromString(String string) {
                 try {
                     return Integer.parseInt(string);
-                } catch(NumberFormatException| NullPointerException ex) {
+                } catch(NumberFormatException | NullPointerException ex) {
                     return null;
                 }
             }
         }));
-
-        ageCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, Number>>() {
+        ageCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, Integer>>() {
             @Override
-            public void handle(TableColumn.CellEditEvent<Worker, Number> event) {
+            public void handle(TableColumn.CellEditEvent<Worker, Integer> event) {
+//                System.out.println(event.getOldValue()+ " => "+ event.getNewValue());
                 if(event.getNewValue() == null) {
                     ((Worker)event.getTableView().getItems().get(
-                            event.getTablePosition().getRow())).setAge(Integer.parseInt(event.getOldValue().toString()));
+                            event.getTablePosition().getRow())).setAge(event.getOldValue());
                     //weird bug in javafx
                     ageCol.setVisible(false);
                     ageCol.setVisible(true);
                 } else {
                     ((Worker)event.getTableView().getItems().get(
-                            event.getTablePosition().getRow())).setAge(Integer.parseInt(event.getNewValue().toString()));
+                            event.getTablePosition().getRow())).setAge(event.getNewValue());
                     updateDAO(event.getTableView().getItems());
+                    tableCellChanged.set(true);
                 }
             }
         });
 
-
-
-        TableColumn<Worker, Number> wageCol = new TableColumn<>("Wage");
-//        wageCol.setCellValueFactory(new PropertyValueFactory<>("wageProperty"));
-        wageCol.setCellValueFactory(param-> param.getValue().wageProperty());
+        TableColumn<Worker, Double> wageCol = new TableColumn<>("Wage");
+        wageCol.setCellValueFactory(new PropertyValueFactory<>("wage"));
         wageCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
-        wageCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Number>() {
+        wageCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Double>() {
             @Override
-            public String toString(Number object) {
+            public String toString(Double object) {
                 try {
                     return object.toString();
                 } catch(NullPointerException ex) {
@@ -231,26 +228,26 @@ public class TableViewResultTabContentWithProperty {
                 }
             }
         }));
-        wageCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, Number>>() {
+        wageCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, Double>>() {
             @Override
-            public void handle(TableColumn.CellEditEvent<Worker, Number> event) {
+            public void handle(TableColumn.CellEditEvent<Worker, Double> event) {
                 if(event.getNewValue() == null) {
                     ((Worker)event.getTableView().getItems().get(
-                            event.getTablePosition().getRow())).setWage(Double.parseDouble(event.getOldValue().toString()));
+                            event.getTablePosition().getRow())).setWage(event.getOldValue());
                     //weird bug in javafx
                     ageCol.setVisible(false);
                     ageCol.setVisible(true);
                 } else {
                     ((Worker)event.getTableView().getItems().get(
-                            event.getTablePosition().getRow())).setWage(Double.parseDouble(event.getNewValue().toString()));
+                            event.getTablePosition().getRow())).setWage(event.getNewValue());
                     updateDAO(event.getTableView().getItems());
+                    tableCellChanged.set(true);
                 }
             }
         });
 
         TableColumn<Worker, Boolean> activeCol = new TableColumn<>("Active");
-//        activeCol.setCellValueFactory(new PropertyValueFactory<>("activeProperty"));
-        activeCol.setCellValueFactory(param-> param.getValue().activeProperty());
+        activeCol.setCellValueFactory(new PropertyValueFactory<>("active"));
         activeCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
         activeCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Boolean>() {
             @Override
@@ -282,6 +279,7 @@ public class TableViewResultTabContentWithProperty {
                     ((Worker)event.getTableView().getItems().get(
                             event.getTablePosition().getRow())).setActive(event.getNewValue());
                     updateDAO(event.getTableView().getItems());
+                    tableCellChanged.set(true);
                 }
             }
         });
@@ -317,8 +315,7 @@ public class TableViewResultTabContentWithProperty {
         });
 
         TableColumn<Worker, String> countryCol = new TableColumn<>("Country");
-//        countryCol.setCellValueFactory(new PropertyValueFactory<>("countryProperty"));
-        countryCol.setCellValueFactory(param-> param.getValue().countryProperty());
+        countryCol.setCellValueFactory(new PropertyValueFactory<>("country"));
         countryCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
         countryCol.setCellFactory(TextFieldTableCell.forTableColumn());
         countryCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
@@ -327,12 +324,12 @@ public class TableViewResultTabContentWithProperty {
                 ((Worker)event.getTableView().getItems().get(
                         event.getTablePosition().getRow())).setCountry(event.getNewValue());
                 updateDAO(event.getTableView().getItems());
+                tableCellChanged.set(true);
             }
         });
 
         TableColumn<Worker, String> cityCol = new TableColumn<>("City");
-//        cityCol.setCellValueFactory(new PropertyValueFactory<>("cityProperty"));
-        cityCol.setCellValueFactory(param-> param.getValue().cityProperty());
+        cityCol.setCellValueFactory(new PropertyValueFactory<>("city"));
         cityCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
         cityCol.setCellFactory(TextFieldTableCell.forTableColumn());
         cityCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
@@ -341,12 +338,12 @@ public class TableViewResultTabContentWithProperty {
                 ((Worker)event.getTableView().getItems().get(
                         event.getTablePosition().getRow())).setCity(event.getNewValue());
                 updateDAO(event.getTableView().getItems());
+                tableCellChanged.set(true);
             }
         });
 
         TableColumn<Worker, String> streetCol = new TableColumn<>("Street");
-//        streetCol.setCellValueFactory(new PropertyValueFactory<>("streetProperty"));
-        streetCol.setCellValueFactory(param-> param.getValue().streetProperty());
+        streetCol.setCellValueFactory(new PropertyValueFactory<>("street"));
         streetCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
         streetCol.setCellFactory(TextFieldTableCell.forTableColumn());
         streetCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
@@ -355,12 +352,12 @@ public class TableViewResultTabContentWithProperty {
                 ((Worker)event.getTableView().getItems().get(
                         event.getTablePosition().getRow())).setStreet(event.getNewValue());
                 updateDAO(event.getTableView().getItems());
+                tableCellChanged.set(true);
             }
         });
 
         TableColumn<Worker, String> plzCol = new TableColumn<>("PLZ");
-//        plzCol.setCellValueFactory(new PropertyValueFactory<>("plzProperty"));
-        plzCol.setCellValueFactory(param-> param.getValue().plzProperty());
+        plzCol.setCellValueFactory(new PropertyValueFactory<>("plz"));
         plzCol.setMinWidth(Constants.MIN_TABLE_COLUMN_WIDTH);
         plzCol.setCellFactory(TextFieldTableCell.forTableColumn());
         plzCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Worker, String>>() {
@@ -369,6 +366,7 @@ public class TableViewResultTabContentWithProperty {
                 ((Worker)event.getTableView().getItems().get(
                         event.getTablePosition().getRow())).setPlz(event.getNewValue());
                 updateDAO(event.getTableView().getItems());
+                tableCellChanged.set(true);
             }
         });
 
@@ -378,7 +376,7 @@ public class TableViewResultTabContentWithProperty {
     }
 
     private void addMockDataToTableView() {
-/*        dao.create(new Worker(1L,"foo", "bar", 10, 100.0,
+        dao.create(new Worker(1L,"foo", "bar", 10, 100.0,
                 true, FXCollections.observableArrayList("Reading", "Writing"), "Germany",
                 "Bochum","Laerholzstrasse", "1234"));
         dao.create(new Worker(2L, "leo", "messi", 20, 200.0,
@@ -386,18 +384,7 @@ public class TableViewResultTabContentWithProperty {
                 "Barcelona", "Catalonia", "23456"));
         dao.create(new Worker(3L, "cris", "tiano", 30, 300.0,
                 true, FXCollections.observableArrayList("Reading", "Listening"), "Italy",
-                "Turin", "Juventus", "34567"));*/
-
-        workerTableView.getItems().add(new Worker(1L,"foo", "bar", 10, 100.0,
-                true, FXCollections.observableArrayList("Reading", "Writing"), "Germany",
-                "Bochum","Laerholzstrasse", "1234"));
-        workerTableView.getItems().add(new Worker(2L, "leo", "messi", 20, 200.0,
-                false, FXCollections.observableArrayList("Speaking", "Listening"), "Spain",
-                "Barcelona", "Catalonia", "23456"));
-        workerTableView.getItems().add(new Worker(3L, "cris", "tiano", 30, 300.0,
-                true, FXCollections.observableArrayList("Reading", "Listening"), "Italy",
                 "Turin", "Juventus", "34567"));
-
         workerTableView.getItems().addAll(dao.findAll());
     }
 
@@ -483,8 +470,101 @@ public class TableViewResultTabContentWithProperty {
         });
 
         btnRefreshTable.setOnAction(e-> {
-            refreshTable();
+           refreshTable();
         });
+
+        workerTableView.setOnKeyPressed(evt-> {
+            if(workerTableView.getSelectionModel().getSelectedItem() == null) return;
+            if(!tableCellChanged.get()) return;
+            KeyCode keyCode = evt.getCode();
+            if(evt.getCode().equals(KeyCode.UP) ||evt.getCode().equals(KeyCode.DOWN)) {
+                Optional<ButtonType> answer = CustomDialogs.showConfirmationDialog("Warning",
+                        "Do you want to leave without saving changes?");
+                answer.ifPresent(consumer-> {
+                    if(consumer.getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                        tableCellChanged.set(false);
+                    } else {
+                        evt.consume();
+                    }
+                });
+            }
+        });
+
+//        workerTableView.editableProperty().bind(tableCellChanged.not());
+        workerTableView.setOnMouseClicked(evt-> {
+            evt.consume();
+        });
+        workerTableView.setOnMousePressed(evt-> {
+            evt.consume();
+        });
+        workerTableView.setOnMouseEntered(evt-> {
+            evt.consume();
+        });
+//        workerTableView.setDisable(true);
+        workerTableView.setOnMouseReleased(evt-> {
+            evt.consume();
+        });
+//        workerTableView.getFocusModel().focus(0);
+
+        workerTableView.setOnDragDetected(evt-> {
+            evt.consume();
+        });
+
+        cbTableEditable.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(!newValue) {
+                    workerTableView.setOnMouseClicked(null);
+                    workerTableView.setOnMousePressed(null);
+                    workerTableView.setOnMouseReleased(null);
+                    workerTableView.setOnMouseEntered(null);
+                    workerTableView.setOnMouseExited(null);
+                }
+            }
+        });
+
+        /*workerTableView.setOnMousePressed(evt-> {
+            if(workerTableView.getSelectionModel().getSelectedItem() == null) return;
+            if(!tableCellChanged.get()) return;
+            Optional<ButtonType> answer = CustomDialogs.showConfirmationDialog("Warning",
+                    "Do you want to leave without saving changes?");
+            answer.ifPresent(consumer-> {
+                if(consumer.getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                    tableCellChanged.set(false);
+                } else {
+                    workerTableView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, false, false, false, false));
+
+                }
+            });
+        });*/
+        
+
+/*        workerTableView.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if(oldValue.intValue() == -1) return;
+                if(newValue.intValue() == -1) {
+                    tableCellChanged.set(false);
+                } else {
+                    if(tableCellChanged && !potentialRecursion) {
+                        Optional<ButtonType> answer = CustomDialogs.showConfirmationDialog("Warning",
+                                "Do you want to leave without saving changes?");
+                        answer.ifPresent(consumer-> {
+                            System.out.println(potentialRecursion);
+                            if(consumer.getButtonData().equals(ButtonBar.ButtonData.OK_DONE)) {
+                                tableCellChanged.set(false);
+                                potentialRecursion = false;
+                            } else {
+                                potentialRecursion = true;
+                                workerTableView.getSelectionModel().clearSelection();
+                                observable.notifyAll();
+                                workerTableView.getSelectionModel().select(oldValue.intValue());
+                            }
+                        });
+                    }
+                }
+            }
+        });*/
 
     }
 

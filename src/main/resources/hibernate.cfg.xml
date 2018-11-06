@@ -30,8 +30,8 @@
         <property name="format_sql">true</property>
         <property name="use_sql_comments">false</property>
 
-        <mapping class="org.ddg.model.Worker" />
-        <mapping class="org.ddg.model.WorkerWithDate" />
+        <!--<mapping class="org.ddg.model.Worker" />-->
+        <!--<mapping class="org.ddg.model.WorkerWithDate" />-->
         <!--<mapping package="com.edutilos.model" />-->
 
         <!-- List of XML mapping files -->

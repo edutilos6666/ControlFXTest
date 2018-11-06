@@ -76,7 +76,7 @@ public class TableViewResultTabContentWithDelay {
        workerTableView = new TableView<>();
        setupTableViewColumns();
 //       workerTableView.setRo
-       addMockDataToTableView();
+//       addMockDataToTableView();
        ScrollPane center = new ScrollPane(workerTableView);
        VBox boxCenter = new VBox();
        HBox hbCenter = new HBox();

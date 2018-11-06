@@ -38,6 +38,7 @@ public class MainController {
     private TableViewTabsWithProperty tableViewTabsWithProperty;
     private TableViewTabsWithDate tableViewTabsWithDate;
     private TableViewTabsWithDelay tableViewTabsWithDelay;
+    private TableViewTabsWithSelectionHalt tableViewTabsWithSelectionHalt;
 
     public void registerKeyBindings(Scene scene) {
         KeyCombination keyCombination = new KeyCodeCombination(
@@ -58,6 +59,7 @@ public class MainController {
         tableViewTabsWithProperty.setScene(scene);
         tableViewTabsWithDate.setScene(scene);
         tableViewTabsWithDelay.setScene(scene);
+        tableViewTabsWithSelectionHalt.setScene(scene);
     }
 
     @FXML
@@ -88,6 +90,7 @@ public class MainController {
         tableViewTabsWithProperty = new TableViewTabsWithProperty();
         tableViewTabsWithDate = new TableViewTabsWithDate();
         tableViewTabsWithDelay = new TableViewTabsWithDelay();
+        tableViewTabsWithSelectionHalt = new TableViewTabsWithSelectionHalt();
         ObservableList<CustomListItem> items = FXCollections.observableArrayList(
                 new CustomListItem(new Label("GridPane"), new GridPaneTabs()),
                 new CustomListItem(new Label("VBoxHBox"), new VBoxHBoxTabs()),
@@ -110,7 +113,8 @@ public class MainController {
                 new CustomListItem(new Label("PieChartTabs"), new PieChartTabs()),
                 new CustomListItem(new Label("ScatterChartTabs"), new ScatterChartTabs()),
                 new CustomListItem(new Label("StackedAreaChartTabs"), new StackedAreaChartTabs()),
-                new CustomListItem(new Label("StackedBarChartTabs"), new StackedBarChartTabs())
+                new CustomListItem(new Label("StackedBarChartTabs"), new StackedBarChartTabs()),
+                new CustomListItem(new Label("TableViewTabsWithSelectionHalt"), tableViewTabsWithSelectionHalt)
         );
         listContent.addAll(items);
         refreshListView(listContent);
